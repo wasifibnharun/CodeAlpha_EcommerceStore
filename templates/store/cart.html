@@ -4,7 +4,7 @@
 <section class="page-shell"><p class="eyebrow">Your selection</p><h1>Shopping cart</h1>
 {% if cart_items %}
     <div class="cart-layout"><div class="cart-items">
-    {% for item in cart_items %}<article class="cart-row"><div><h3>{{ item.product.name }}</h3><p>Quantity: {{ item.quantity }} &middot; ৳{{ item.product.price }} each</p></div><div><strong>৳{{ item.subtotal }}</strong><form action="{% url 'store:cart_remove' item.product.id %}" method="post">{% csrf_token %}<button class="text-danger">Remove</button></form></div></article>{% endfor %}
+    {% for item in cart_items %}<article class="cart-row"><div><h3>{{ item.product.name }}</h3><p>৳{{ item.product.price }} each</p><form class="quantity-form" action="{% url 'store:cart_update' item.product.id %}" method="post">{% csrf_token %}<label for="quantity-{{ item.product.id }}">Quantity</label><input id="quantity-{{ item.product.id }}" type="number" name="quantity" value="{{ item.quantity }}" min="0" max="{{ item.product.stock }}"><button>Update</button></form></div><div><strong>৳{{ item.subtotal }}</strong><form action="{% url 'store:cart_remove' item.product.id %}" method="post">{% csrf_token %}<button class="text-danger">Remove</button></form></div></article>{% endfor %}
     </div><aside class="summary"><h2>Order summary</h2><div><span>Total</span><strong>৳{{ cart_total }}</strong></div><a class="button full" href="{% url 'store:checkout' %}">Continue to checkout</a></aside></div>
 {% else %}<div class="empty"><h2>Your cart is empty.</h2><p>Discover something useful in our collection.</p><a class="button" href="{% url 'store:product_list' %}">Start shopping</a></div>{% endif %}
 </section>

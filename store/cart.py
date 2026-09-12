@@ -20,6 +20,14 @@ class Cart:
         self.data.pop(str(product.pk), None)
         self._save()
 
+    def update(self, product, quantity):
+        product_id = str(product.pk)
+        if quantity <= 0:
+            self.data.pop(product_id, None)
+        else:
+            self.data[product_id] = min(quantity, product.stock)
+        self._save()
+
     def clear(self):
         self.session.pop(self.SESSION_KEY, None)
         self.session.modified = True

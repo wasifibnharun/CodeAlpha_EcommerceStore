@@ -1,11 +1,12 @@
 from django.core.management.base import BaseCommand
 
-from store.models import Product
+from store.models import Category, Product
 
 
 PRODUCTS = [
     {
         "name": "Everyday Backpack",
+        "category": "Bags",
         "slug": "everyday-backpack",
         "description": "A lightweight, durable backpack with room for a laptop and daily essentials.",
         "price": "2490.00",
@@ -14,6 +15,7 @@ PRODUCTS = [
     },
     {
         "name": "Wireless Headphones",
+        "category": "Electronics",
         "slug": "wireless-headphones",
         "description": "Comfortable over-ear headphones with clear sound and long battery life.",
         "price": "3890.00",
@@ -22,6 +24,7 @@ PRODUCTS = [
     },
     {
         "name": "Classic Wristwatch",
+        "category": "Accessories",
         "slug": "classic-wristwatch",
         "description": "A minimal everyday watch with a timeless dial and comfortable leather strap.",
         "price": "3200.00",
@@ -36,5 +39,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for values in PRODUCTS:
-            Product.objects.update_or_create(slug=values["slug"], defaults=values)
+            values = values.copy()
+            category_name = values.pop("category")
+            category, _ = Category.objects.get_or_create(
+                name=category_name,
+                defaults={"slug": category_name.lower()},
+            )
+            Product.objects.update_or_create(
+                slug=values["slug"],
+                defaults={**values, "category": category},
+            )
         self.stdout.write(self.style.SUCCESS(f"Loaded {len(PRODUCTS)} demo products."))

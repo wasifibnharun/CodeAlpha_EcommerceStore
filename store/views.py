@@ -2,17 +2,36 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from .cart import Cart
 from .forms import CheckoutForm, RegisterForm
-from .models import Order, OrderItem, Product
+from .models import Category, Order, OrderItem, Product
 
 
 def product_list(request):
-    products = Product.objects.filter(is_active=True)
-    return render(request, "store/product_list.html", {"products": products})
+    products = Product.objects.filter(is_active=True).select_related("category")
+    categories = Category.objects.all()
+    query = request.GET.get("q", "").strip()
+    category_slug = request.GET.get("category", "").strip()
+
+    if query:
+        products = products.filter(Q(name__icontains=query) | Q(description__icontains=query))
+    if category_slug:
+        products = products.filter(category__slug=category_slug)
+
+    return render(
+        request,
+        "store/product_list.html",
+        {
+            "products": products,
+            "categories": categories,
+            "query": query,
+            "selected_category": category_slug,
+        },
+    )
 
 
 def product_detail(request, slug):
@@ -53,6 +72,18 @@ def cart_remove(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     Cart(request).remove(product)
     messages.info(request, f"{product.name} was removed from your cart.")
+    return redirect("store:cart_detail")
+
+
+@require_POST
+def cart_update(request, product_id):
+    product = get_object_or_404(Product, pk=product_id, is_active=True)
+    try:
+        quantity = int(request.POST.get("quantity", 1))
+    except (TypeError, ValueError):
+        quantity = 1
+    Cart(request).update(product, quantity)
+    messages.success(request, "Your cart was updated.")
     return redirect("store:cart_detail")
 
 
@@ -102,3 +133,9 @@ def checkout(request):
 def order_success(request, order_id):
     order = get_object_or_404(Order, pk=order_id, user=request.user)
     return render(request, "store/order_success.html", {"order": order})
+
+
+@login_required
+def order_history(request):
+    orders = request.user.orders.prefetch_related("items__product")
+    return render(request, "store/order_history.html", {"orders": orders})

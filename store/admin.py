@@ -1,12 +1,18 @@
 from django.contrib import admin
 
-from .models import Order, OrderItem, Product
+from .models import Category, Order, OrderItem, Product
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "slug")
+    prepopulated_fields = {"slug": ("name",)}
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("name", "price", "stock", "is_active")
-    list_filter = ("is_active",)
+    list_display = ("name", "category", "price", "stock", "is_active")
+    list_filter = ("category", "is_active")
     list_editable = ("price", "stock", "is_active")
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name", "description")

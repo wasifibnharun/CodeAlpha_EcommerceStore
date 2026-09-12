@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Your orders | NovaMart{% endblock %}
+{% block content %}
+<section class="page-shell"><p class="eyebrow">Your account</p><h1>Order history</h1>
+{% if orders %}<div class="order-list">
+{% for order in orders %}<article class="order-card"><header><div><p class="eyebrow">Order #{{ order.id }}</p><h2>{{ order.created_at|date:"F j, Y" }}</h2></div><span class="status status-{{ order.status }}">{{ order.get_status_display }}</span></header><div class="order-lines">{% for item in order.items.all %}<p><span>{{ item.quantity }} &times; {{ item.product.name }}</span><strong>৳{{ item.subtotal }}</strong></p>{% endfor %}</div><footer><span>Sent to {{ order.address|truncatechars:60 }}</span><strong>Total: ৳{{ order.total }}</strong></footer></article>{% endfor %}
+</div>{% else %}<div class="empty"><h2>No orders yet.</h2><p>Your completed purchases will appear here.</p><a class="button" href="{% url 'store:product_list' %}">Browse products</a></div>{% endif %}
+</section>
+{% endblock %}

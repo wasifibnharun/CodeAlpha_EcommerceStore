@@ -5,10 +5,13 @@ A responsive Django e-commerce MVP built for CodeAlpha Full Stack Development Ta
 ## Features
 
 - Product catalog and detail pages
+- Product categories, filtering, and search
 - Registration, login, and logout
 - Session-based shopping cart
+- Cart quantity controls
 - Authenticated checkout and order creation
 - Stock validation and inventory reduction
+- Customer order history
 - Product and order management in Django admin
 - Automated tests for the main shopping flow
 
