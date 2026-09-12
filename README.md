@@ -73,16 +73,17 @@ docker run --rm -p 8000:8000 `
 
 The container applies migrations, collects static assets, and starts Gunicorn. The health endpoint is `/health/`.
 
-## Render deployment
+## Free Render deployment
 
-The repository includes a `render.yaml` Blueprint that provisions:
+Create the resources manually in the Render dashboard to remain on the free Hobby plan:
 
-- A free Docker web service in Render's Singapore region
-- A free Render PostgreSQL database connected through `DATABASE_URL`
-- An automatically generated Django secret key
-- HTTPS security settings, health checks, and deploys on every commit to the linked branch
+1. Create a free PostgreSQL database named `codealpha-ecommerce-db` in Singapore.
+2. Create a free Docker web service from this repository's `main` branch, also in Singapore.
+3. Set `DATABASE_URL` to the database's internal URL.
+4. Generate `DJANGO_SECRET_KEY`, then set `DJANGO_DEBUG=false`, `DJANGO_SECURE_SSL_REDIRECT=true`, and `DJANGO_SECURE_HSTS_SECONDS=3600`.
+5. Set the health check path to `/health/` and create the web service.
 
-In Render, choose **New > Blueprint**, connect this repository, review the two free resources, and deploy the Blueprint. The container automatically applies migrations and loads demo products only when the catalog is empty.
+The container automatically applies migrations, collects static files, and loads demo products only when the catalog is empty.
 
 Free Render web services have an ephemeral filesystem, so admin-uploaded product images do not survive restarts. The seeded catalog uses remote image URLs and remains fully visible. Use object storage or a paid persistent disk before relying on uploaded images in a long-lived deployment.
 
