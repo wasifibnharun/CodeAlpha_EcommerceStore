@@ -73,6 +73,21 @@ docker run --rm -p 8000:8000 `
 
 The container applies migrations, collects static assets, and starts Gunicorn. The health endpoint is `/health/`.
 
+## Render deployment
+
+The repository includes a `render.yaml` Blueprint that provisions:
+
+- A free Docker web service in Render's Singapore region
+- A free Render PostgreSQL database connected through `DATABASE_URL`
+- An automatically generated Django secret key
+- HTTPS security settings, health checks, and deploys on every commit to the linked branch
+
+In Render, choose **New > Blueprint**, connect this repository, review the two free resources, and deploy the Blueprint. The container automatically applies migrations and loads demo products only when the catalog is empty.
+
+Free Render web services have an ephemeral filesystem, so admin-uploaded product images do not survive restarts. The seeded catalog uses remote image URLs and remains fully visible. Use object storage or a paid persistent disk before relying on uploaded images in a long-lived deployment.
+
+Free Render PostgreSQL databases expire after 30 days. Upgrade the database or move to another persistent PostgreSQL provider before that deadline if the demo must remain online longer.
+
 ## Production checklist
 
 - Run `python manage.py check --deploy` with production environment variables.

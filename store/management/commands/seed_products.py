@@ -37,7 +37,17 @@ PRODUCTS = [
 class Command(BaseCommand):
     help = "Create or refresh the demo product catalog."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--if-empty",
+            action="store_true",
+            help="Load demo products only when the catalog has no products.",
+        )
+
     def handle(self, *args, **options):
+        if options["if_empty"] and Product.objects.exists():
+            self.stdout.write("Catalog already contains products; skipping demo data.")
+            return
         for values in PRODUCTS:
             values = values.copy()
             category_name = values.pop("category")
