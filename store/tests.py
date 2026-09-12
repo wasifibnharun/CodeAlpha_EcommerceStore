@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
@@ -23,6 +24,26 @@ class StoreFlowTests(TestCase):
         self.assertContains(response, "Test Product")
         response = self.client.get(self.product.get_absolute_url())
         self.assertContains(response, "A product used by the automated tests.")
+
+    def test_health_check(self):
+        response = self.client.get(reverse("store:health_check"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"status": "ok"})
+
+    def test_product_uses_remote_image_as_upload_fallback(self):
+        self.product.image_url = "https://example.com/product.jpg"
+        self.assertEqual(self.product.display_image, "https://example.com/product.jpg")
+
+    def test_product_can_store_an_uploaded_image(self):
+        gif = (
+            b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00"
+            b"\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00"
+            b"\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;"
+        )
+        self.product.image = SimpleUploadedFile("product.gif", gif, content_type="image/gif")
+        self.product.save(update_fields=["image"])
+        self.assertIn("/media/products/", self.product.display_image)
+        self.product.image.delete(save=False)
 
     def test_cart_add_requires_post(self):
         response = self.client.get(reverse("store:cart_add", args=[self.product.pk]))

@@ -29,6 +29,7 @@ class Product(models.Model):
     slug = models.SlugField(max_length=180, unique=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.ImageField(upload_to="products/%Y/%m/", blank=True)
     image_url = models.URLField(blank=True)
     stock = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -42,6 +43,12 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse("store:product_detail", args=[self.slug])
+
+    @property
+    def display_image(self):
+        if self.image:
+            return self.image.url
+        return self.image_url
 
 
 class Order(models.Model):
