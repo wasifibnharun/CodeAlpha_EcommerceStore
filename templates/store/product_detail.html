@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} | NovaMart{% endblock %}
+{% block content %}
+<section class="detail-layout">
+    <div class="detail-image">{% if product.image_url %}<img src="{{ product.image_url }}" alt="{{ product.name }}">{% endif %}</div>
+    <div class="detail-copy"><p class="eyebrow">NovaMart collection</p><h1>{{ product.name }}</h1><p class="price">৳{{ product.price }}</p><p>{{ product.description }}</p><p class="stock">{{ product.stock }} currently available</p>
+        <form action="{% url 'store:cart_add' product.id %}" method="post">{% csrf_token %}<button class="button full" {% if not product.stock %}disabled{% endif %}>Add to cart</button></form>
+        <a class="back-link" href="{% url 'store:product_list' %}">&larr; Back to the collection</a>
+    </div>
+</section>
+{% endblock %}

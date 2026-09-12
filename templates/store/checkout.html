@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Checkout | NovaMart{% endblock %}
+{% block content %}
+<section class="page-shell narrow"><p class="eyebrow">Final step</p><h1>Checkout</h1><div class="checkout-layout">
+<form method="post" class="form-card">{% csrf_token %}{{ form.as_p }}<button class="button full">Place order &middot; ৳{{ cart_total }}</button></form>
+<aside class="summary"><h2>Your items</h2>{% for item in cart_items %}<div><span>{{ item.quantity }} &times; {{ item.product.name }}</span><strong>৳{{ item.subtotal }}</strong></div>{% endfor %}<hr><div><span>Total</span><strong>৳{{ cart_total }}</strong></div></aside>
+</div></section>
+{% endblock %}
